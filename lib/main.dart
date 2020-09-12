@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'DraggedCard.dart';
 import 'package:http/http.dart' as http;
-import 'Question.dart';
+import 'Models/Question.dart';
 
 void main() {
   runApp(MyApp());
@@ -90,10 +92,12 @@ class DecisionButton extends StatelessWidget {
   }
 }
 
-Future<Question> FetchQuestion() async {
-  final res = await http.get('http://localhost:6969/newQuestion');
+Future<Question> fetchQuestion() async {
+  final res = await http.get('http://192.168.1.16:6969/newQuestion');
   if (res.statusCode == 200) {
-    return Question.fromJson(json.decode(res.body));
+    final objFromJson = json.decode(res.body);
+
+    return Question.fromJson(objFromJson);
   } else {
     throw Exception("can't load questions....");
   }
@@ -106,12 +110,16 @@ class Fuck extends StatefulWidget {
 
 class _FuckState extends State<Fuck> {
   bool isLeft = false;
-  Future<Question> currentQuestion;
+  Question currentQuestion;
   int questionCounter = 0;
-
+  List<int> questions = [1, 2, 4, 5, 6];
   void initState() {
     super.initState();
-    currentQuestion = FetchQuestion();
+    fetchQuestion().then((question) => {
+          setState(() {
+            currentQuestion = question;
+          })
+        });
   }
 
   @override
@@ -121,11 +129,10 @@ class _FuckState extends State<Fuck> {
         children: <Widget>[
           Draggable(
               child: questionCounter < questions.length - 1
-                  ? DraggedCard(
-                      isLeft: isLeft, question: questions[questionCounter])
+                  ? DraggedCard(isLeft: isLeft, question: currentQuestion?.text)
                   : Text("לא נשארו עוד שאלות"),
-              feedback: DraggedCard(
-                  isLeft: isLeft, question: questions[questionCounter]),
+              feedback:
+                  DraggedCard(isLeft: isLeft, question: currentQuestion?.text),
               childWhenDragging: questionCounter < questions.length - 2
                   ? DraggedCard(
                       isLeft: isLeft, question: questions[questionCounter + 1])
