@@ -1,26 +1,37 @@
 import 'package:flutter/material.dart';
 
 class DraggedCard extends StatelessWidget {
-  DraggedCard({@required this.isLeft, @required this.question});
-  final isLeft;
-  final question;
+  DraggedCard({@required this.text, @required this.situation});
+
+  final text;
+  final situation;
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Center(
-          child: Text('$question',
-              style: TextStyle(
-                  fontWeight: FontWeight.w100,
-                  fontSize: 40,
-                  color: Colors.black87),
-              maxLines: 2,
-              textWidthBasis: TextWidthBasis.longestLine)),
-      width: MediaQuery.of(context).size.width - 50,
-      height: MediaQuery.of(context).size.height * 0.45,
-      decoration: BoxDecoration(
-          border: Border.all(color: Colors.green[100], width: 1),
-          color: Colors.white70,
-          borderRadius: BorderRadius.circular(4)),
-    );
+        child: Center(
+            child: Text('$text',
+                style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                    fontSize: 20,
+                    decoration: TextDecoration.none,
+                    fontStyle: FontStyle.italic,
+                    fontFamily: "RobotoMono",
+                    color: Colors.black),
+                maxLines: 5,
+                textAlign: TextAlign.center,
+                textWidthBasis: TextWidthBasis.longestLine)),
+        width: MediaQuery.of(context).size.width - 100,
+        height: MediaQuery.of(context).size.height * 0.50,
+        padding: EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: Colors.blue[300], width: 5),
+          image: DecorationImage(
+              image: AssetImage("assets/images/questionMark.png"),
+              colorFilter: ColorFilter.mode(
+                  Colors.black.withOpacity(.06), BlendMode.dstATop),
+              fit: BoxFit.cover),
+        ));
   }
 }

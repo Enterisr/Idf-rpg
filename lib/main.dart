@@ -13,15 +13,22 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-        backgroundColor: Colors.black,
-        visualDensity: VisualDensity.comfortable,
-      ),
-      home: MyHomePage(title: 'Flutter Dem'),
-    );
+    return Material(
+        type: MaterialType.transparency,
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          builder: (context, child) {
+            return Directionality(
+                textDirection: TextDirection.rtl, child: child);
+          },
+          theme: ThemeData(
+            primarySwatch: Colors.green,
+            backgroundColor: Colors.black,
+            fontFamily: "openSans",
+            visualDensity: VisualDensity.comfortable,
+          ),
+          home: MyHomePage(title: 'Flutter Dem'),
+        ));
   }
 }
 
@@ -44,8 +51,6 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Text('פזם',
-                style: new TextStyle(fontSize: 30, color: Colors.green)),
             Row(
               children: <Widget>[
                 Text('כבוד: ' + this.respect.toString(),
@@ -59,7 +64,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      backgroundColor: Colors.grey[800],
+      backgroundColor: Colors.grey[900],
     );
   }
 }
@@ -109,64 +114,69 @@ class Fuck extends StatefulWidget {
 }
 
 class _FuckState extends State<Fuck> {
-  bool isLeft = false;
-  Question currentQuestion;
+  String situation = "loading"; //implication,question, etc..
+  Question currentQuestion = Question(text: 'טוען שאלות');
   int questionCounter = 0;
+  String text = "טוען שאלות";
   List<int> questions = [1, 2, 4, 5, 6];
+
   void initState() {
     super.initState();
     fetchQuestion().then((question) => {
           setState(() {
             currentQuestion = question;
+            text = currentQuestion.text;
+            situation = "question";
           })
         });
+  }
+
+  void madeChoice(bool choice) {
+    setState(() {
+      text = choice
+          ? currentQuestion.confirmImplication.text
+          : currentQuestion.rejectImplication.text;
+      situation = "implication";
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
+        //TODO: this is stupid, make it so it only show once
         children: <Widget>[
           Draggable(
               child: questionCounter < questions.length - 1
-                  ? DraggedCard(isLeft: isLeft, question: currentQuestion?.text)
-                  : Text("לא נשארו עוד שאלות"),
-              feedback:
-                  DraggedCard(isLeft: isLeft, question: currentQuestion?.text),
+                  ? DraggedCard(text: text, situation: situation)
+                  : Text(
+                      "לא נשארו עוד שאלות",
+                      style: TextStyle(color: Colors.white),
+                    ),
+              feedback: DraggedCard(text: text, situation: situation),
               childWhenDragging: questionCounter < questions.length - 2
                   ? DraggedCard(
-                      isLeft: isLeft, question: questions[questionCounter + 1])
-                  : Text("לא נשארו עוד שאלות"),
+                      text: questions[questionCounter + 1],
+                      situation: situation)
+                  : Text(
+                      "לא נשארו עוד שאלות",
+                      style: TextStyle(color: Colors.white),
+                    ),
               onDragEnd: (drag) {
                 double xPos = drag.offset.dx;
-                debugPrint("y offset: " + drag.offset.dy.toString());
-                debugPrint("x offset: " + drag.offset.dx.toString());
                 if (xPos < -150 || xPos > 150) {
-                  setState(() {
-                    isLeft = xPos < 10;
-                    questionCounter++;
-                  });
+                  madeChoice(xPos > 150);
                 }
               }),
           Row(
             children: <Widget>[
               DecisionButton(
-                  submitDesicion: () => {
-                        setState(() {
-                          questionCounter++;
-                        })
-                      },
+                  submitDesicion: () => {madeChoice(true)}, text: "כע"),
+              DecisionButton(
+                  submitDesicion: () => {madeChoice(false)},
                   text: "לע",
                   icon: Icons.thumb_down,
                   color: Colors.red[300]),
-              DecisionButton(
-                  submitDesicion: () => {
-                        setState(() {
-                          debugPrint("pressed כעע");
-                          questionCounter++;
-                        })
-                      },
-                  text: "כע"),
             ],
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,

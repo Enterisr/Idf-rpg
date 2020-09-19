@@ -12,9 +12,10 @@ class Question {
 
   factory Question.fromJson(Map<String, dynamic> json) {
     dynamic tmp = chooseImplication(json["rejectImplication"]);
-    Implication regAns = Implication.fromJson(tmp);
+
+    Implication regAns = resolveImplication(tmp);
     tmp = chooseImplication(json["confirmImplication"]);
-    Implication conAns = Implication.fromJson(tmp);
+    Implication conAns = resolveImplication(tmp);
 
     return Question(
         id: json["id"],
@@ -25,5 +26,12 @@ class Question {
 
   static dynamic chooseImplication(List possibleImplications) {
     return possibleImplications[Random().nextInt(possibleImplications.length)];
+  }
+
+  static dynamic resolveImplication(dynamic tmp) {
+    if (tmp is String) {
+      return Implication.fromJson(text: tmp);
+    }
+    return Implication.fromJson(json: tmp);
   }
 }

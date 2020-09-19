@@ -1,5 +1,3 @@
-import 'Question.dart';
-
 import 'Effect.dart';
 
 class Implication {
@@ -16,30 +14,31 @@ class Implication {
       this.implication,
       this.followUpQuestion});
 
-  Implication.onlyText(String text) {}
-
   factory Implication.fromJson({Map<String, dynamic> json, String text}) {
     if (json != null) {
-      Effect effect = Effect(
-        cashEffect: json["effect"]["c"],
-        wassahEffect: json["effect"]["w"],
-        respectEffect: json["effect"]["r"],
-      );
+      Effect effect;
+      if (json["effect"] != null) {
+        effect = Effect(
+          cashEffect: json["effect"]["c"],
+          wassahEffect: json["effect"]["w"],
+          respectEffect: json["effect"]["r"],
+        );
+      } else {
+        effect = new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0);
+      }
       return Implication(
         id: json["id"],
         text: json["text"],
         effect: effect,
-        followUpQuestion: json["followUpQuestion"],
+        followUpQuestion:
+            json["implication"] != null ? json["followUpQuestion"] : -1,
         implication: json["implication"] != null
             ? Implication.fromJson(json: json["implication"])
             : null,
       );
-    } else {
-      return Implication.onlyText(text);
     }
-  }
-  //TODO:
-  Question fetchFollowup() {
-    //ask something in the future about this past desicion...
+    return Implication(
+        text: text,
+        effect: new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0));
   }
 }
