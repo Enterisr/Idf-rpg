@@ -43,6 +43,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double wassah = 0.0;
   double respect = 0.0;
+  double cash = 0.0;
   double pazam = 0.0; //percent
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,9 @@ class _MyHomePageState extends State<MyHomePage> {
               children: <Widget>[
                 Text('כבוד: ' + this.respect.toString(),
                     style: new TextStyle(fontSize: 20, color: Colors.blue)),
+                Text('כסף: ' + this.cash.toString(),
+                    style:
+                        new TextStyle(fontSize: 20, color: Colors.greenAccent)),
                 Text('ווסאח: ' + this.wassah.toString(),
                     style: new TextStyle(fontSize: 20, color: Colors.yellow))
               ],
@@ -115,13 +119,16 @@ class Fuck extends StatefulWidget {
 
 class _FuckState extends State<Fuck> {
   String situation = "loading"; //implication,question, etc..
-  Question currentQuestion = Question(text: 'טוען שאלות');
+  Question currentQuestion = Question(text: '');
   int questionCounter = 0;
-  String text = "טוען שאלות";
+  String text = "";
   List<int> questions = [1, 2, 4, 5, 6];
 
-  void initState() {
-    super.initState();
+  void newQuestion() {
+    setState(() {
+      text = "טוען שאלה";
+      situation = "loading";
+    });
     fetchQuestion().then((question) => {
           setState(() {
             currentQuestion = question;
@@ -131,13 +138,23 @@ class _FuckState extends State<Fuck> {
         });
   }
 
+  void initState() {
+    super.initState();
+    newQuestion();
+  }
+
   void madeChoice(bool choice) {
-    setState(() {
-      text = choice
-          ? currentQuestion.confirmImplication.text
-          : currentQuestion.rejectImplication.text;
-      situation = "implication";
-    });
+    if (situation == "question") {
+      setState(() {
+        text = choice
+            ? currentQuestion.confirmImplication.text
+            : currentQuestion.rejectImplication.text;
+        situation = "implication";
+        new Future.delayed(const Duration(seconds: 3), newQuestion);
+      });
+    } else {
+      newQuestion();
+    }
   }
 
   @override

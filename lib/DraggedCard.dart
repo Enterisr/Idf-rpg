@@ -5,6 +5,21 @@ class DraggedCard extends StatelessWidget {
 
   final text;
   final situation;
+  final themeMap = {
+    "implication": {
+      "img": AssetImage("assets/images/exclamationMark.png"),
+      "color": Colors.yellow[300]
+    },
+    "question": {
+      "img": AssetImage("assets/images/questionMark.png"),
+      "color": Colors.blue[300]
+    },
+    "loading": {
+      "img": AssetImage("assets/images/spinner.gif"),
+      "color": Colors.green[300]
+    }
+  };
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -14,7 +29,6 @@ class DraggedCard extends StatelessWidget {
                     fontWeight: FontWeight.w300,
                     fontSize: 20,
                     decoration: TextDecoration.none,
-                    fontStyle: FontStyle.italic,
                     fontFamily: "RobotoMono",
                     color: Colors.black),
                 maxLines: 5,
@@ -25,10 +39,10 @@ class DraggedCard extends StatelessWidget {
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.blue[300], width: 5),
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: themeMap[situation]["color"], width: 5),
           image: DecorationImage(
-              image: AssetImage("assets/images/questionMark.png"),
+              image: themeMap[situation]["img"],
               colorFilter: ColorFilter.mode(
                   Colors.black.withOpacity(.06), BlendMode.dstATop),
               fit: BoxFit.cover),
