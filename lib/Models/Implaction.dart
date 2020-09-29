@@ -18,11 +18,7 @@ class Implication {
     if (json != null) {
       Effect effect;
       if (json["effect"] != null) {
-        effect = Effect(
-          cashEffect: json["effect"]["c"],
-          wassahEffect: json["effect"]["w"],
-          respectEffect: json["effect"]["r"],
-        );
+        effect = Effect.fromJson(effectMap: json["effect"]);
       } else {
         effect = new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0);
       }

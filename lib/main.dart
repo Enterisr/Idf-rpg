@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'DraggedCard.dart';
 import 'package:http/http.dart' as http;
 import 'Models/Question.dart';
+import 'Models/Player.dart';
+import 'Models/Implaction.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +18,7 @@ class MyApp extends StatelessWidget {
     return Material(
         type: MaterialType.transparency,
         child: MaterialApp(
-          title: 'Flutter Demo',
+          title: 'idf_rpg',
           builder: (context, child) {
             return Directionality(
                 textDirection: TextDirection.rtl, child: child);
@@ -41,10 +43,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  double wassah = 0.0;
-  double respect = 0.0;
-  double cash = 0.0;
-  double pazam = 0.0; //percent
+  Player player = Player();
+  void initState() {
+    super.initState();
+  }
+
+  /*void initPlayer (){
+     player =  ;
+
+  }*/
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,17 +61,23 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Text('כבוד: ' + this.respect.toString(),
+                Text('כבוד: ' + this.player.stats?.respectEffect.toString(),
                     style: new TextStyle(fontSize: 20, color: Colors.blue)),
-                Text('כסף: ' + this.cash.toString(),
+                Text('כסף: ' + this.player.stats?.cashEffect.toString(),
                     style:
                         new TextStyle(fontSize: 20, color: Colors.greenAccent)),
-                Text('ווסאח: ' + this.wassah.toString(),
+                Text('ווסאח: ' + this.player.stats?.wassahEffect.toString(),
                     style: new TextStyle(fontSize: 20, color: Colors.yellow))
               ],
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),
-            Fuck()
+            Fuck(
+                player: player,
+                addEffect: (newEffect) => {
+                      setState(() {
+                        player.stats.addEffect(newEffect);
+                      })
+                    })
           ],
         ),
       ),
@@ -113,6 +126,10 @@ Future<Question> fetchQuestion() async {
 }
 
 class Fuck extends StatefulWidget {
+  final Player player;
+  final Function addEffect;
+  const Fuck({Key key, @required this.player, @required this.addEffect})
+      : super(key: key);
   @override
   _FuckState createState() => _FuckState();
 }
@@ -145,12 +162,18 @@ class _FuckState extends State<Fuck> {
 
   void madeChoice(bool choice) {
     if (situation == "question") {
+      Implication implication = choice
+          ? currentQuestion.confirmImplication
+          : currentQuestion.rejectImplication;
       setState(() {
-        text = choice
-            ? currentQuestion.confirmImplication.text
-            : currentQuestion.rejectImplication.text;
+        text = implication.text;
         situation = "implication";
-        new Future.delayed(const Duration(seconds: 3), newQuestion);
+
+        int wordsNum = text.split(" ").length;
+        //this is just the below avg reading speed for an adult
+        int delay = (wordsNum / 3).round();
+        widget.addEffect(implication.effect);
+        new Future.delayed(Duration(seconds: delay), newQuestion);
       });
     } else {
       newQuestion();
