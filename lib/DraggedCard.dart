@@ -34,8 +34,8 @@ class DraggedCard extends StatelessWidget {
                 maxLines: 5,
                 textAlign: TextAlign.center,
                 textWidthBasis: TextWidthBasis.longestLine)),
-        width: MediaQuery.of(context).size.width - 100,
-        height: MediaQuery.of(context).size.height * 0.50,
+        width: MediaQuery.of(context).size.width - 80,
+        height: MediaQuery.of(context).size.height * 0.60,
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Colors.white,

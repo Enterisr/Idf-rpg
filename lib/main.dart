@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'Models/Question.dart';
 import 'Models/Player.dart';
 import 'Models/Implaction.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import 'StatField.dart';
 
 void main() {
   runApp(MyApp());
@@ -42,16 +45,36 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  Player player = Player();
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
+  Player player;
+  bool isAnimated = false;
+
+  @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    player = Player(setStats: (newStats) {
+      print("ok2");
+      setState(() {
+        player.stats = newStats;
+      });
+    });
     super.initState();
   }
 
-  /*void initPlayer (){
-     player =  ;
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
 
-  }*/
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState appState) {
+    print(appState);
+    if (appState == AppLifecycleState.paused) {
+      this.player.saveStatsToFile();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,13 +84,24 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                Text('כבוד: ' + this.player.stats?.respectEffect.toString(),
-                    style: new TextStyle(fontSize: 20, color: Colors.blue)),
-                Text('כסף: ' + this.player.stats?.cashEffect.toString(),
-                    style:
-                        new TextStyle(fontSize: 20, color: Colors.greenAccent)),
-                Text('ווסאח: ' + this.player.stats?.wassahEffect.toString(),
-                    style: new TextStyle(fontSize: 20, color: Colors.yellow))
+                StatField(
+                  name: "כבוד",
+                  value: this.player.stats?.respectEffect,
+                  isAnimated: isAnimated,
+                  icon: FaIcon(FontAwesomeIcons.handshake,
+                      color: Colors.blueAccent),
+                ),
+                StatField(
+                    name: "כסף",
+                    icon: FaIcon(FontAwesomeIcons.coins,
+                        color: Colors.greenAccent),
+                    value: this.player.stats?.cashEffect,
+                    isAnimated: isAnimated),
+                StatField(
+                    name: "ווסאח",
+                    value: this.player.stats?.wassahEffect,
+                    icon: FaIcon(FontAwesomeIcons.fire, color: Colors.yellow),
+                    isAnimated: isAnimated),
               ],
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             ),
@@ -75,7 +109,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 player: player,
                 addEffect: (newEffect) => {
                       setState(() {
+                        isAnimated = true;
                         player.stats.addEffect(newEffect);
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          setState(() {
+                            isAnimated = false;
+                          });
+                        });
                       })
                     })
           ],

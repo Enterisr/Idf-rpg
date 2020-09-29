@@ -1,4 +1,6 @@
 import "dart:math";
+import 'package:flutter/cupertino.dart';
+
 import 'Effect.dart';
 import 'package:admatay/Utils/FileHandler.dart';
 import 'dart:convert';
@@ -7,14 +9,17 @@ class Player {
   String id;
   String name;
   Effect stats;
-
-  Player({int id, String name, Effect stats}) {
+  Function setStats;
+  Player({int id, String name, Effect stats, @required this.setStats}) {
     initStats();
   }
 
   initStats() {
     stats = new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0);
-    Player.readStatsFromFile().then((statsFromFile) => {stats = statsFromFile});
+    Player.readStatsFromFile().then((statsFromFile) {
+      print('ok');
+      setStats(statsFromFile);
+    });
   }
 
   static dynamic chooseImplication(List possibleImplications) {
@@ -33,5 +38,11 @@ class Player {
       statsFromFile = Effect.fromBlank();
     }
     return statsFromFile;
+  }
+
+  void saveStatsToFile() async {
+    String statsJsoned = jsonEncode(this.stats.toJson());
+    FileHandler fileHandler = new FileHandler(fileName: "player.json");
+    fileHandler.writeToFile(statsJsoned);
   }
 }

@@ -14,8 +14,12 @@ class Effect {
   factory Effect.fromBlank() {
     return Effect(wassahEffect: 0, cashEffect: 0, respectEffect: 0);
   }
-  toJson() {
-    return jsonEncode(this);
+  Map<String, dynamic> toJson() {
+    return {
+      "r": this.respectEffect,
+      "c": this.cashEffect,
+      "w": this.wassahEffect
+    };
   }
 
   Effect({int wassahEffect, int cashEffect, int respectEffect}) {
