@@ -9,8 +9,14 @@ class Player {
   String id;
   String name;
   Effect stats;
+  double pazam;
   Function setStats;
-  Player({int id, String name, Effect stats, @required this.setStats}) {
+  Player(
+      {int id,
+      String name,
+      Effect stats,
+      @required this.setStats,
+      this.pazam}) {
     initStats();
   }
 

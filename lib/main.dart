@@ -53,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   void initState() {
     WidgetsBinding.instance.addObserver(this);
     player = Player(setStats: (newStats) {
-      print("ok2");
       setState(() {
         player.stats = newStats;
       });
@@ -134,22 +133,23 @@ class DecisionButton extends StatelessWidget {
       this.icon});
   Color color;
   String text;
-  IconData icon;
+  Icon icon;
   Function submitDesicion;
   @override
   Widget build(BuildContext context) {
     return Container(
       child: RaisedButton(
-        child: this.icon != null ? Icon(this.icon) : Icon(Icons.thumb_up),
+        child: this.icon != null ? this.icon : Icon(Icons.thumb_up),
         onPressed: this.submitDesicion,
         color: this.color != null ? this.color : Colors.green[300],
         shape: new RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(100.0),
         ),
       ),
-      padding: EdgeInsets.all(20.0),
-      height: 120.0,
-      width: 120.0,
+      padding: EdgeInsets.all(10.0),
+      margin: EdgeInsets.symmetric(vertical: 10.0),
+      height: 80.0,
+      width: 80.0,
     );
   }
 }
@@ -227,40 +227,37 @@ class _FuckState extends State<Fuck> {
         //TODO: this is stupid, make it so it only show once
         children: <Widget>[
           Draggable(
-              child: questionCounter < questions.length - 1
-                  ? DraggedCard(text: text, situation: situation)
-                  : Text(
-                      "לא נשארו עוד שאלות",
-                      style: TextStyle(color: Colors.white),
-                    ),
-              feedback: DraggedCard(text: text, situation: situation),
-              childWhenDragging: questionCounter < questions.length - 2
-                  ? DraggedCard(
-                      text: questions[questionCounter + 1],
-                      situation: situation)
-                  : Text(
-                      "לא נשארו עוד שאלות",
-                      style: TextStyle(color: Colors.white),
-                    ),
+              child: DraggedCard(
+                  text: text, situation: situation, isDragged: false),
+              feedback: DraggedCard(
+                  text: text, situation: situation, isDragged: true),
+              childWhenDragging: DraggedCard(
+                  text: text, situation: situation, isDragged: false),
+              onDragStarted: () {},
               onDragEnd: (drag) {
                 double xPos = drag.offset.dx;
                 if (xPos < -150 || xPos > 150) {
                   madeChoice(xPos > 150);
                 }
               }),
-          Row(
-            children: <Widget>[
-              DecisionButton(
-                  submitDesicion: () => {madeChoice(true)}, text: "כע"),
-              DecisionButton(
-                  submitDesicion: () => {madeChoice(false)},
-                  text: "לע",
-                  icon: Icons.thumb_down,
-                  color: Colors.red[300]),
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-          )
+          Container(
+              child: Row(
+                children: <Widget>[
+                  DecisionButton(
+                      submitDesicion: () => {madeChoice(true)},
+                      text: "כע",
+                      icon: new Icon(Icons.thumb_up, color: Colors.green[800]),
+                      color: Colors.greenAccent[300]),
+                  DecisionButton(
+                      submitDesicion: () => {madeChoice(false)},
+                      text: "לע",
+                      icon: new Icon(Icons.thumb_down, color: Colors.red[800]),
+                      color: Colors.red[400]),
+                ],
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 40.0))
         ],
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 class DraggedCard extends StatelessWidget {
-  DraggedCard({@required this.text, @required this.situation});
+  DraggedCard(
+      {@required this.text,
+      @required this.situation,
+      @required this.isDragged});
 
   final text;
+  final bool isDragged;
   final situation;
   final themeMap = {
     "implication": {
@@ -15,8 +19,14 @@ class DraggedCard extends StatelessWidget {
       "color": Colors.blue[300]
     },
     "loading": {
-      "img": AssetImage("assets/images/spinner.gif"),
+      "img": AssetImage(
+        "assets/images/spinner.gif",
+      ),
       "color": Colors.green[300]
+    },
+    "nextCard": {
+      "img": AssetImage("assets/images/spinner.gif"),
+      "color": Colors.black
     }
   };
 
@@ -36,11 +46,11 @@ class DraggedCard extends StatelessWidget {
                 textWidthBasis: TextWidthBasis.longestLine)),
         width: MediaQuery.of(context).size.width - 80,
         height: MediaQuery.of(context).size.height * 0.60,
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(5.0),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-          border: Border.all(color: themeMap[situation]["color"], width: 5),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: themeMap[situation]["color"], width: 4),
           image: DecorationImage(
               image: themeMap[situation]["img"],
               colorFilter: ColorFilter.mode(
