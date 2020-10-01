@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -14,12 +15,14 @@ void main() {
   runApp(MyApp());
 }
 
+enum dragState { left, right, none }
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return Material(
-        type: MaterialType.transparency,
+        type: MaterialType.card,
         child: MaterialApp(
           title: 'idf_rpg',
           builder: (context, child) {
@@ -29,7 +32,6 @@ class MyApp extends StatelessWidget {
           theme: ThemeData(
             primarySwatch: Colors.green,
             backgroundColor: Colors.black,
-            fontFamily: "openSans",
             visualDensity: VisualDensity.comfortable,
           ),
           home: MyHomePage(title: 'Flutter Dem'),
@@ -68,7 +70,6 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState appState) {
-    print(appState);
     if (appState == AppLifecycleState.paused) {
       this.player.saveStatsToFile();
     }
@@ -110,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       setState(() {
                         isAnimated = true;
                         player.stats.addEffect(newEffect);
-                        Future.delayed(const Duration(milliseconds: 100), () {
+                        Future.delayed(const Duration(milliseconds: 200), () {
                           setState(() {
                             isAnimated = false;
                           });
@@ -125,31 +126,62 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   }
 }
 
-class DecisionButton extends StatelessWidget {
-  DecisionButton(
-      {@required this.text,
-      @required this.submitDesicion,
+class DecisionButton extends StatefulWidget {
+  final Color color;
+  final String text;
+  final Icon icon;
+  final Function submitDesicion;
+  const DecisionButton(
+      {Key key,
       this.color,
-      this.icon});
-  Color color;
-  String text;
-  Icon icon;
-  Function submitDesicion;
+      @required this.text,
+      this.icon,
+      this.submitDesicion})
+      : super(key: key);
+  @override
+  _DecisionButton createState() => _DecisionButton();
+}
+
+class _DecisionButton extends State<DecisionButton> {
+  bool _isSelfPressed = false;
+
   @override
   Widget build(BuildContext context) {
     return Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          boxShadow: _isSelfPressed
+              ? [
+                  BoxShadow(
+                    color: Color.lerp(
+                        Colors.black, widget.color ?? Colors.green[300], 1.5),
+                    blurRadius: 4.0, // has the effect of softening the shadow
+                    spreadRadius: -4, // has the effect of extending the shadow
+                  )
+                ]
+              : []),
       child: RaisedButton(
-        child: this.icon != null ? this.icon : Icon(Icons.thumb_up),
-        onPressed: this.submitDesicion,
-        color: this.color != null ? this.color : Colors.green[300],
+        child: widget.icon != null ? widget.icon : Icon(Icons.thumb_up),
+        onPressed: () {
+          widget.submitDesicion();
+          setState(() {
+            _isSelfPressed = true;
+            Future.delayed(Duration(milliseconds: 200), () {
+              setState(() {
+                _isSelfPressed = false;
+              });
+            });
+          });
+        },
+        color: widget.color != null ? widget.color : Colors.green[300],
         shape: new RoundedRectangleBorder(
           borderRadius: new BorderRadius.circular(100.0),
         ),
       ),
-      padding: EdgeInsets.all(10.0),
+      padding: EdgeInsets.all(5.0),
       margin: EdgeInsets.symmetric(vertical: 10.0),
-      height: 80.0,
-      width: 80.0,
+      height: 90.0,
+      width: 90.0,
     );
   }
 }
@@ -177,9 +209,10 @@ class Fuck extends StatefulWidget {
 class _FuckState extends State<Fuck> {
   String situation = "loading"; //implication,question, etc..
   Question currentQuestion = Question(text: '');
-  int questionCounter = 0;
   String text = "";
-  List<int> questions = [1, 2, 4, 5, 6];
+  double directionSum = 0.0;
+  StreamController<dragState> dragDirectionStream =
+      StreamController<dragState>.broadcast(); //this is a nightmare
 
   void newQuestion() {
     setState(() {
@@ -222,45 +255,85 @@ class _FuckState extends State<Fuck> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        //TODO: this is stupid, make it so it only show once
-        children: <Widget>[
-          Draggable(
-              child: DraggedCard(
-                  text: text, situation: situation, isDragged: false),
-              feedback: DraggedCard(
-                  text: text, situation: situation, isDragged: true),
-              childWhenDragging: DraggedCard(
-                  text: text, situation: situation, isDragged: false),
-              onDragStarted: () {},
-              onDragEnd: (drag) {
-                double xPos = drag.offset.dx;
-                if (xPos < -150 || xPos > 150) {
-                  madeChoice(xPos > 150);
-                }
-              }),
-          Container(
-              child: Row(
-                children: <Widget>[
-                  DecisionButton(
-                      submitDesicion: () => {madeChoice(true)},
-                      text: "כע",
-                      icon: new Icon(Icons.thumb_up, color: Colors.green[800]),
-                      color: Colors.greenAccent[300]),
-                  DecisionButton(
-                      submitDesicion: () => {madeChoice(false)},
-                      text: "לע",
-                      icon: new Icon(Icons.thumb_down, color: Colors.red[800]),
-                      color: Colors.red[400]),
-                ],
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 40.0))
-        ],
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      ),
-    );
+    return Listener(
+        //TODO: this is an hackish sulotion
+        onPointerUp: (event) => {
+              setState(() {
+                directionSum = 0;
+              })
+            },
+        onPointerMove: (details) {
+          setState(() {
+            directionSum += details.delta.dx;
+          });
+          if (directionSum >= 100) {
+            setState(() {
+              dragDirectionStream.add(dragState.right);
+            });
+          } else if (directionSum < -100) {
+            setState(() {
+              dragDirectionStream.add(dragState.left);
+            });
+          } else {
+            dragDirectionStream.add(dragState.none);
+          }
+        },
+        child: Container(
+          child: Column(
+            //TODO: this is stupid, make it so it only show once
+            children: <Widget>[
+              this.situation == "question"
+                  ? Draggable(
+                      child: DraggedCard(
+                          text: text, situation: situation, isDragged: false),
+                      feedback: StreamBuilder(
+                          initialData: dragState.none,
+                          stream: dragDirectionStream.stream,
+                          builder: (context, snapshot) {
+                            return DraggedCard(
+                                text: text,
+                                situation: situation,
+                                isDragged: true,
+                                direction: snapshot.data ?? dragState.none);
+                          }),
+                      childWhenDragging: DraggedCard(
+                        text: text,
+                        situation: situation,
+                        isDragged: false,
+                      ),
+                      onDragEnd: (drag) {
+                        double xPos = drag.offset.dx;
+                        if (xPos < -150 || xPos > 150) {
+                          madeChoice(xPos > 150);
+                        }
+                      })
+                  : DraggedCard(
+                      text: text, situation: situation, isDragged: false),
+              Container(
+                  child: Row(
+                    children: <Widget>[
+                      DecisionButton(
+                          submitDesicion: () {
+                            madeChoice(true);
+                          },
+                          text: "כע",
+                          icon: new Icon(Icons.thumb_up,
+                              color: Colors.green[800]),
+                          color: Colors.greenAccent[300]),
+                      DecisionButton(
+                          submitDesicion: () => {madeChoice(false)},
+                          text: "לע",
+                          icon: new Icon(Icons.thumb_down,
+                              color: Colors.red[800]),
+                          color: Colors.red[400]),
+                    ],
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 40.0))
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          ),
+        ));
   }
 }

@@ -8,12 +8,6 @@
             "name": "Flutter",
             "request": "launch",
             "type": "dart"
-        },
-        {
-            "command": "npm start",
-            "name": "Run npm start",
-            "request": "launch",
-            "type": "node-terminal"
         }
     ]
 }

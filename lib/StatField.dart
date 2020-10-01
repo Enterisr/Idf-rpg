@@ -18,12 +18,16 @@ class StatField extends StatelessWidget {
         child: Column(children: [
       icon,
       Center(
-          child: AnimatedDefaultTextStyle(
-              style: this.isAnimated
-                  ? TextStyle(fontSize: 18)
-                  : TextStyle(fontSize: 17),
-              duration: const Duration(milliseconds: 100),
-              child: Text(name + ": " + value.toString()))),
+        child: AnimatedDefaultTextStyle(
+            style: this.isAnimated
+                ? TextStyle(fontSize: 18)
+                : TextStyle(fontSize: 17),
+            duration: const Duration(milliseconds: 100),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              Text(name + ": ", textDirection: TextDirection.rtl),
+              Text(value.toString(), textDirection: TextDirection.ltr),
+            ])),
+      )
     ]));
   }
 }
