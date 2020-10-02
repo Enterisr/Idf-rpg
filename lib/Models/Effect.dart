@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class Effect {
   int wassahEffect;
   int cashEffect;

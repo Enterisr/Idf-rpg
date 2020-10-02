@@ -66,8 +66,8 @@ class _DraggedCard extends State<DraggedCard> {
                 maxLines: 5,
                 textAlign: TextAlign.center,
                 textWidthBasis: TextWidthBasis.parent)),
-        width: MediaQuery.of(context).size.width - 80,
-        height: MediaQuery.of(context).size.height * 0.60,
+        width: MediaQuery.of(context).size.width - 40,
+        height: MediaQuery.of(context).size.height * 0.65,
         padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           boxShadow: [
