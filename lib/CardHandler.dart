@@ -6,6 +6,8 @@ import 'dart:async';
 import 'main.dart';
 import 'DecisionButton.dart';
 import 'DraggedCard.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class CardHandler extends StatefulWidget {
   final Player player;
@@ -21,6 +23,7 @@ class _CardHandlerState extends State<CardHandler> {
   Question currentQuestion = Question(text: '');
   String text = "";
   double directionSum = 0.0;
+  EdgeInsets cardAlignment = EdgeInsets.all(0);
   StreamController<dragState> dragDirectionStream =
       StreamController<dragState>.broadcast(); //this is a nightmare
 
@@ -38,6 +41,17 @@ class _CardHandlerState extends State<CardHandler> {
         });
   }
 
+  Future<Question> fetchQuestion() async {
+    final res = await http.get('http://192.168.1.16:6969/newQuestion');
+    if (res.statusCode == 200) {
+      final objFromJson = json.decode(res.body);
+
+      return Question.fromJson(objFromJson);
+    } else {
+      throw Exception("can't load questions....");
+    }
+  }
+
   void initState() {
     super.initState();
     newQuestion();
@@ -51,7 +65,7 @@ class _CardHandlerState extends State<CardHandler> {
       setState(() {
         text = implication.text;
         situation = "implication";
-
+        cardAlignment = EdgeInsets.all(0);
         int wordsNum = text.split(" ").length;
         //this is just the below avg reading speed for an adult
         int delay = (wordsNum / 3).round();
@@ -95,7 +109,10 @@ class _CardHandlerState extends State<CardHandler> {
               this.situation == "question"
                   ? Draggable(
                       child: DraggedCard(
-                          text: text, situation: situation, isDragged: false),
+                          text: text,
+                          situation: situation,
+                          cardAlignment: cardAlignment,
+                          isDragged: false),
                       feedback: StreamBuilder(
                           initialData: dragState.none,
                           stream: dragDirectionStream.stream,
@@ -124,14 +141,26 @@ class _CardHandlerState extends State<CardHandler> {
                     children: <Widget>[
                       DecisionButton(
                           submitDesicion: () {
-                            madeChoice(true);
+                            setState(() {
+                              cardAlignment =
+                                  EdgeInsets.fromLTRB(1500, 50, 0, 0);
+                            });
+                            new Future.delayed(const Duration(seconds: 1),
+                                () => madeChoice(true));
                           },
                           text: "כע",
                           icon: new Icon(Icons.thumb_up,
                               color: Colors.green[800]),
                           color: Colors.greenAccent[300]),
                       DecisionButton(
-                          submitDesicion: () => {madeChoice(false)},
+                          submitDesicion: () {
+                            setState(() {
+                              cardAlignment =
+                                  EdgeInsets.fromLTRB(0, 50, 1500, 0);
+                            });
+                            new Future.delayed(const Duration(seconds: 1),
+                                () => madeChoice(false));
+                          },
                           text: "לע",
                           icon: new Icon(Icons.thumb_down,
                               color: Colors.red[800]),

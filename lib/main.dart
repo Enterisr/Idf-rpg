@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'CardHandler.dart';
-import 'package:http/http.dart' as http;
-import 'Models/Question.dart';
 import 'Models/Player.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'StatField.dart';
@@ -120,16 +117,5 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
       ),
       backgroundColor: Colors.grey[900],
     );
-  }
-}
-
-Future<Question> fetchQuestion() async {
-  final res = await http.get('http://192.168.1.16:6969/newQuestion');
-  if (res.statusCode == 200) {
-    final objFromJson = json.decode(res.body);
-
-    return Question.fromJson(objFromJson);
-  } else {
-    throw Exception("can't load questions....");
   }
 }

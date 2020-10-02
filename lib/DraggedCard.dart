@@ -6,12 +6,15 @@ class DraggedCard extends StatefulWidget {
       {@required this.text,
       @required this.situation,
       @required this.isDragged,
+      this.cardAlignment,
       this.direction});
 
   final text;
   final bool isDragged;
+  final EdgeInsets cardAlignment;
   final situation;
   final dragState direction;
+
   final themeMap = {
     "implication": {
       "img": AssetImage("assets/images/exclamationMark.png"),
@@ -54,7 +57,11 @@ class _DraggedCard extends State<DraggedCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    print(widget.cardAlignment);
+    return AnimatedContainer(
+        duration: Duration(milliseconds: 500),
+        margin: widget.cardAlignment,
+        curve: Curves.easeInOut,
         child: Center(
             child: Text('${widget.text}',
                 style: TextStyle(
