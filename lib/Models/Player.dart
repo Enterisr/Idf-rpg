@@ -11,6 +11,7 @@ class Player {
   Effect stats;
   double pazam;
   Function setStats;
+
   Player(
       {int id,
       String name,
@@ -21,11 +22,14 @@ class Player {
   }
 
   initStats() {
-    stats = new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0);
+    stats = new Effect.fromBlank();
     Player.readStatsFromFile().then((statsFromFile) {
-      print('ok');
       setStats(statsFromFile);
     });
+  }
+
+  bool isLost() {
+    return this.stats.isContainsNegativeStat();
   }
 
   static dynamic chooseImplication(List possibleImplications) {

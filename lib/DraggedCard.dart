@@ -57,9 +57,8 @@ class _DraggedCard extends State<DraggedCard> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.cardAlignment);
     return AnimatedContainer(
-        duration: Duration(milliseconds: 500),
+        duration: Duration(milliseconds: 300),
         margin: widget.cardAlignment,
         curve: Curves.easeInOut,
         child: Center(
@@ -75,14 +74,15 @@ class _DraggedCard extends State<DraggedCard> {
                 textWidthBasis: TextWidthBasis.parent)),
         width: MediaQuery.of(context).size.width - 40,
         height: MediaQuery.of(context).size.height * 0.65,
-        padding: EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(15.0),
         decoration: BoxDecoration(
-          boxShadow: [
+          /*    boxShadow: [
             BoxShadow(
                 blurRadius: 5,
                 color: widget.themeMap[widget.situation]["color"],
                 spreadRadius: 2)
-          ],
+          ], This is performence burden*/
+
           color: resolveColor(),
           borderRadius: BorderRadius.circular(40),
           border: Border.all(

@@ -28,17 +28,24 @@ class _CardHandlerState extends State<CardHandler> {
       StreamController<dragState>.broadcast(); //this is a nightmare
 
   void newQuestion() {
-    setState(() {
-      text = "טוען שאלה";
-      situation = "loading";
-    });
-    fetchQuestion().then((question) => {
-          setState(() {
-            currentQuestion = question;
-            text = currentQuestion.text;
-            situation = "question";
-          })
-        });
+    if (!widget.player.isLost()) {
+      setState(() {
+        text = "טוען שאלה";
+        situation = "loading";
+      });
+      fetchQuestion().then((question) => {
+            setState(() {
+              currentQuestion = question;
+              text = currentQuestion.text;
+              situation = "question";
+            })
+          });
+    } else {
+      setState(() {
+        text = 'הפסדת!';
+        situation = "implication";
+      });
+    }
   }
 
   Future<Question> fetchQuestion() async {
@@ -143,7 +150,7 @@ class _CardHandlerState extends State<CardHandler> {
                           submitDesicion: () {
                             setState(() {
                               cardAlignment =
-                                  EdgeInsets.fromLTRB(1500, 50, 0, 0);
+                                  EdgeInsets.fromLTRB(1500, 0, 0, 0);
                             });
                             new Future.delayed(const Duration(seconds: 1),
                                 () => madeChoice(true));
@@ -156,7 +163,7 @@ class _CardHandlerState extends State<CardHandler> {
                           submitDesicion: () {
                             setState(() {
                               cardAlignment =
-                                  EdgeInsets.fromLTRB(0, 50, 1500, 0);
+                                  EdgeInsets.fromLTRB(0, 0, 1500, 0);
                             });
                             new Future.delayed(const Duration(seconds: 1),
                                 () => madeChoice(false));
