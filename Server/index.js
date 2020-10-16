@@ -18,6 +18,7 @@ app.get('/newQuestion', (req, res) => {
 		const client = MongoClient.connect(MONGO_URL, async (e, client) => {
 			const db = client.db('TinderClone');
 			let questions = await db.collection('Questions').find().toArray();
+			
 			res.send(Utils.selectRandomFromArray(questions));
 		});
 	} catch (ex) {
