@@ -50,6 +50,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/exclamationMark.png
+    - assets/images/Skull.png
     - assets/images/spinner.gif
     - assets/images/questionMark.png
   # To add assets to your application, add an assets section, like this:

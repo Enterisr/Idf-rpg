@@ -15,7 +15,7 @@ app.use(cors());
 
 app.get('/newQuestion', (req, res) => {
 	try {
-		const client = MongoClient.connect(MONGO_URL, async (e, client) => {
+		 MongoClient.connect(MONGO_URL, async (e, client) => {
 			const db = client.db('TinderClone');
 			let questions = await db.collection('Questions').find().toArray();
 			

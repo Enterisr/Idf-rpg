@@ -20,7 +20,7 @@ class Implication {
       if (json["effect"] != null) {
         effect = Effect.fromJson(effectMap: json["effect"]);
       } else {
-        effect = new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0);
+        effect = Effect.non();
       }
       return Implication(
         id: json["id"],
@@ -33,8 +33,6 @@ class Implication {
             : null,
       );
     }
-    return Implication(
-        text: text,
-        effect: new Effect(cashEffect: 0, respectEffect: 0, wassahEffect: 0));
+    return Implication(text: text, effect: Effect.non());
   }
 }

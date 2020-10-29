@@ -33,19 +33,26 @@ class _CardHandlerState extends State<CardHandler> {
         text = "טוען שאלה";
         situation = "loading";
       });
-      fetchQuestion().then((question) => {
-            setState(() {
-              currentQuestion = question;
-              text = currentQuestion.text;
-              situation = "question";
-            })
-          });
+      setNewQuesiton();
     } else {
       setState(() {
         text = 'הפסדת!';
-        situation = "implication";
+        situation = "lost";
+        Future.delayed(const Duration(seconds: 1), () {
+          setNewQuesiton();
+        });
       });
     }
+  }
+
+  void setNewQuesiton() {
+    fetchQuestion().then((question) => {
+          setState(() {
+            currentQuestion = question;
+            text = currentQuestion.text;
+            situation = "question";
+          })
+        });
   }
 
   Future<Question> fetchQuestion() async {
@@ -152,7 +159,8 @@ class _CardHandlerState extends State<CardHandler> {
                               cardAlignment =
                                   EdgeInsets.fromLTRB(1500, 0, 0, 0);
                             });
-                            new Future.delayed(const Duration(seconds: 1),
+                            new Future.delayed(
+                                const Duration(milliseconds: 500),
                                 () => madeChoice(true));
                           },
                           text: "כע",
@@ -165,7 +173,8 @@ class _CardHandlerState extends State<CardHandler> {
                               cardAlignment =
                                   EdgeInsets.fromLTRB(0, 0, 1500, 0);
                             });
-                            new Future.delayed(const Duration(seconds: 1),
+                            new Future.delayed(
+                                const Duration(milliseconds: 500),
                                 () => madeChoice(false));
                           },
                           text: "לע",
@@ -176,7 +185,7 @@ class _CardHandlerState extends State<CardHandler> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.end,
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 40.0))
+                  padding: EdgeInsets.symmetric(horizontal: 20.0))
             ],
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           ),

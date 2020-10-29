@@ -20,6 +20,10 @@ class DraggedCard extends StatefulWidget {
       "img": AssetImage("assets/images/exclamationMark.png"),
       "color": Colors.yellow[300]
     },
+    "lost": {
+      "img": AssetImage("assets/images/Skull.png"),
+      "color": Colors.black
+    },
     "question": {
       "img": AssetImage("assets/images/questionMark.png"),
       "color": Colors.blue[300]
@@ -58,7 +62,7 @@ class _DraggedCard extends State<DraggedCard> {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-        duration: Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 100),
         margin: widget.cardAlignment,
         curve: Curves.easeInOut,
         child: Center(
@@ -90,7 +94,7 @@ class _DraggedCard extends State<DraggedCard> {
           image: DecorationImage(
               image: widget.themeMap[widget.situation]["img"],
               colorFilter: ColorFilter.mode(
-                  Colors.black.withOpacity(.06), BlendMode.dstATop),
+                  Colors.black.withOpacity(.1), BlendMode.dstIn),
               fit: BoxFit.cover),
         ));
   }

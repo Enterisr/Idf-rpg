@@ -20,6 +20,14 @@ class Effect {
         respectEffect: 100,
         pazamEffect: 1);
   }
+  factory Effect.non() {
+    return Effect(
+        wassahEffect: 0,
+        tashEffect: 0,
+        cashEffect: 0,
+        respectEffect: 0,
+        pazamEffect: 0);
+  }
   Map<String, dynamic> toJson() {
     return {
       "r": this.respectEffect,

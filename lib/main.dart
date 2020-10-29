@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:admatay/Models/Effect.dart';
 import 'package:flutter/material.dart';
 import 'CardHandler.dart';
 import 'Models/Player.dart';
@@ -44,16 +45,18 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   Player player;
   bool isAnimated = false;
-
+  Effect newEffect;
   @override
   void initState() {
     WidgetsBinding.instance.addObserver(this);
-    player = Player(setStats: (newStats) {
-      setState(() {
-        player.stats = newStats;
-      });
-    });
+    player = Player(setStats: setPlayerStats);
     super.initState();
+  }
+
+  void setPlayerStats(newStats) {
+    setState(() {
+      player.stats = newStats;
+    });
   }
 
   @override
@@ -69,6 +72,16 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
     }
   }
 
+  void handleLosing() {
+    Future.delayed(const Duration(seconds: 10), () {
+      setState(() {
+        this.player =
+            Player(setStats: setPlayerStats, toReadStatsFromFile: false);
+        this.player.saveStatsToFile();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,8 +93,9 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
               children: <Widget>[
                 StatField(
                   name: "כבוד",
-                  value: this.player.stats?.respectEffect,
+                  value: this.player.stats.respectEffect,
                   isAnimated: isAnimated,
+                  effectShift: this?.newEffect?.respectEffect,
                   icon: FaIcon(FontAwesomeIcons.handshake,
                       color: Colors.blueAccent),
                 ),
@@ -89,17 +103,20 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                     name: "כסף",
                     icon: FaIcon(FontAwesomeIcons.coins,
                         color: Colors.greenAccent),
-                    value: this.player.stats?.cashEffect,
+                    value: this.player.stats.cashEffect,
+                    effectShift: this?.newEffect?.cashEffect,
                     isAnimated: isAnimated),
                 StatField(
                     name: 'ת"ש',
-                    value: this.player.stats?.tashEffect,
+                    value: this.player.stats.tashEffect,
+                    effectShift: this?.newEffect?.tashEffect,
                     icon: FaIcon(FontAwesomeIcons.solidSmile,
                         color: Colors.pink[300]),
                     isAnimated: isAnimated),
                 StatField(
                     name: 'פז"ם',
-                    value: this.player.stats?.pazamEffect,
+                    value: this.player.stats.pazamEffect,
+                    effectShift: this?.newEffect?.pazamEffect,
                     icon: FaIcon(FontAwesomeIcons.hourglassHalf,
                         color: Colors.green),
                     isAnimated: isAnimated),
@@ -112,11 +129,17 @@ class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
                       setState(() {
                         isAnimated = true;
                         player.stats.addEffect(newEffect);
-                        Future.delayed(const Duration(milliseconds: 200), () {
+                        this.newEffect = newEffect;
+                        Future.delayed(const Duration(milliseconds: 1000), () {
                           setState(() {
                             isAnimated = false;
+                            this.newEffect = null;
                           });
                         });
+
+                        if (this.player.isLost()) {
+                          handleLosing();
+                        }
                       })
                     })
           ],

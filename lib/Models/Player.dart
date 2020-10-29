@@ -17,15 +17,18 @@ class Player {
       String name,
       Effect stats,
       @required this.setStats,
+      bool toReadStatsFromFile = true,
       this.pazam}) {
-    initStats();
+    initStats(toReadStatsFromFile);
   }
 
-  initStats() {
+  initStats(bool toReadStatsFromFile) {
     stats = new Effect.fromBlank();
-    Player.readStatsFromFile().then((statsFromFile) {
-      setStats(statsFromFile);
-    });
+    if (toReadStatsFromFile) {
+      Player.readStatsFromFile().then((statsFromFile) {
+        setStats(statsFromFile);
+      });
+    }
   }
 
   bool isLost() {
